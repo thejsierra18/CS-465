@@ -63,5 +63,9 @@ process.on('SIGTERM', function() {
     });
 });
 
+connect();
+
 // BRING IN YOUR SCHEMAS & MODELS
-require('./locations');
+
+// require('./locations');
+require('./models/travlr');
