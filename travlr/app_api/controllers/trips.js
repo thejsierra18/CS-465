@@ -26,8 +26,9 @@ const tripsFindCode = async (req, res) => {
     });
 };
 
-const tripsAddTrips = async (req, res) => {
-    Model
+const tripsAddTrip = async (req, res) => {
+    getUser(req, res, (req, res) => {
+        Model
         .create({
             code: req.body.code,
             name: req.body.name,
@@ -49,10 +50,12 @@ const tripsAddTrips = async (req, res) => {
                     .json(trip);
             }
         });
-}
+    });
+};
 
 const tripsUpdateTrip = async (req, res) => {
-    Model
+    getUser(req, res, (req, res) => {
+        Model
         .findOneAndUpdate({ 'code': req.params.tripCode }, {
             code: req.body.code,
             name: req.body.name,
@@ -84,11 +87,28 @@ const tripsUpdateTrip = async (req, res) => {
                 .status(500) // server error
                 .json(err);
         });
-}
+    });  
+};
+
+const getUser = (req, res, callback) => {
+    if (req.payload && req.payload.email) {
+      user.findOne({ email: req.payload.email }).exec((err, user) => {
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        } else if (err) {
+          console.log(err);
+          return res.status(404).json(err);
+        }
+        callback(req, res, user.name);
+        });
+    } else {
+      return res.status(404).json({ message: "User not found" });
+    }
+};
 
 module.exports = {
     tripsList,
     tripsFindCode,
-    tripsAddTrips,
+    tripsAddTrip: tripsAddTrip,
     tripsUpdateTrip
 };
